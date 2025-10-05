@@ -11,17 +11,19 @@ def programador(id):
     """
     Simula um programador que precisa de acesso exclusivo ao compilador
     e acesso compartilhado ao banco de dados (máximo 2 simultâneos).
+    Os recursos são independentes - programadores podem acessar o banco
+    mesmo quando o compilador estiver ocupado.
     """
     while True:
         print(f"[Programador {id}] Quer compilar - aguardando recursos...")
         
-        # Primeiro pega o compilador (acesso exclusivo)
-        with compilador:
-            print(f"[Programador {id}] ✅ Pegou o compilador (acesso exclusivo)")
+        # Pega acesso ao banco de dados (acesso compartilhado, max 2)
+        with banco_dados:
+            print(f"[Programador {id}] ✅ Acessando banco de dados (compartilhado)")
             
-            # Depois pega acesso ao banco de dados (acesso compartilhado, max 2)
-            with banco_dados:
-                print(f"[Programador {id}] ✅ Acessando banco de dados (compartilhado)")
+            # Agora pega o compilador (acesso exclusivo)
+            with compilador:
+                print(f"[Programador {id}] ✅ Pegou o compilador (acesso exclusivo)")
                 print(f"[Programador {id}] 🔄 Compilando módulo...")
                 
                 # Simula tempo de compilação
@@ -30,9 +32,9 @@ def programador(id):
                 
                 print(f"[Programador {id}] ✅ Compilação concluída!")
             
-            print(f"[Programador {id}] 🔓 Liberou banco de dados")
+            print(f"[Programador {id}] 🔓 Liberou compilador")
         
-        print(f"[Programador {id}] 🔓 Liberou compilador")
+        print(f"[Programador {id}] 🔓 Liberou banco de dados")
         
         # Simula tempo de descanso/pensamento antes da próxima compilação
         tempo_descanso = random.uniform(1, 3)
@@ -46,6 +48,7 @@ def q2():
     - 5 programadores
     - 1 compilador (acesso exclusivo)
     - 1 banco de dados (máximo 2 programadores simultâneos)
+    - Recursos independentes: banco de dados pode ser acessado mesmo com compilador ocupado
     - Execução em loop infinito para apresentação
     """
     print("=== Questão 2: Laboratório de Programadores ===")
@@ -53,6 +56,7 @@ def q2():
     print("- 1 Compilador (acesso exclusivo)")
     print("- 1 Banco de dados (máximo 2 programadores simultâneos)")
     print("- 5 Programadores trabalhando")
+    print("- Recursos independentes: banco pode ser acessado mesmo com compilador ocupado")
     print("\nIniciando simulação...\n")
     
     threads = []
@@ -65,9 +69,14 @@ def q2():
             args=(programador_id,),
             name=f"Programador-{programador_id}"
         )
-        t.daemon = True
+        t.daemon = True 
         t.start()
         threads.append(t)
     
-    while True:
-        time.sleep(1)
+    try:
+        # Loop infinito para apresentação em sala
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\n\nSimulação interrompida pelo usuário.")
+        print("=== Fim da simulação ===")
